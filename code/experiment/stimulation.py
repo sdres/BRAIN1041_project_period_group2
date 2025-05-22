@@ -65,6 +65,17 @@ win = visual.Window(size=(pix_width, pix_height),
                     )
 
 
+# Fixation dot - center [black]
+fixation_dot = visual.Circle(
+    win,
+    autoLog=False,
+    name='dotFix',
+    units='deg',
+    radius=0.075,
+    fillColor=[0.0, 0.0, 0.0],
+    lineColor=[0.0, 0.0, 0.0],
+    )
+
 # Set initial text
 instruction_text = visual.TextStim(
     win=win,
@@ -112,8 +123,10 @@ run_experiment = True
 
 # Set starting frequency
 curr_freq = 1000
-
+trial_counter = 0
 while run_experiment:
+    fixation_dot.draw()
+    win.flip()
 
     # Start of trial
 
@@ -124,6 +137,10 @@ while run_experiment:
     core.wait(2)
     sd.play(curr_sound, sr)
     core.wait(2)
+
+    eval_text.draw()
+    win.flip()
+    core.wait(4)
 
     for keys in event.getKeys():
         if keys in ['1']:
@@ -138,6 +155,7 @@ while run_experiment:
             logging.data('Answer correct')
             curr_freq += (curr_freq / 100) * 10  # Increasing test frequency by 10 percent
 
+
         if keys in ['2']:
             # Freq was perceived to be lower
             logging.data('Key2 pressed')
@@ -149,6 +167,12 @@ while run_experiment:
             if curr_freq > base_freq:  # Answer NOT correct
                 logging.data('Answer correct')
                 curr_freq -= (curr_freq / 100) * 10  # Decreasing test frequency by 10 percent
+
+        trial_counter += 1
+
+        if trial_counter == 5:
+            run_experiment = False
+
 
 end_text.draw()
 win.flip()
